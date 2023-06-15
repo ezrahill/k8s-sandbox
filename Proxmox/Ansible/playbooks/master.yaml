@@ -1,0 +1,46 @@
+- hosts: masters
+  remote_user: kube
+  tasks:
+    - name: initialize the cluster
+      become: true
+      ignore_errors: true
+      shell: kubeadm init --control-plane-endpoint=192.168.21.90 --node-name k8s-ctl --pod-network-cidr=10.244.0.0/16
+      args:
+        chdir: $HOME
+        creates: cluster_initialized.txt
+
+    - name: create .kube directory
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copies admin.conf to user's kube config
+      become: yes
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/kube/.kube/config
+        remote_src: yes
+        owner: kube
+        group: kube
+
+    # https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
+    - name: install Pod network
+      command: kubectl create -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+      args:
+        chdir: $HOME
+        
+    - name: Get the token for joining the worker nodes
+      shell: kubeadm token create  --print-join-command
+      register: kubernetes_join_command
+
+    - name: Debug
+      debug:
+        msg: "{{ kubernetes_join_command.stdout }}"
+
+    - name: Copy join command to local file.
+      local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="./kubernetes_join_command"
+
+  handlers:
+    - name: docker status
+      service: name=docker state=started
