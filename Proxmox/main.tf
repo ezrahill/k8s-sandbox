@@ -40,11 +40,16 @@ resource "proxmox_vm_qemu" "k8s-ctl" {
     bridge = "vmbr0"
   }
 
+  ipconfig0 = "ip=192.168.21.77/24,gw=192.168.21.1"
+
+  nameserver = "192.168.21.88"
   lifecycle {
     ignore_changes = [
       network,
     ]
   }
+  # /var/lib/vz/snippets/vendor.yaml
+  cicustom = "vendor=local:snippets/vendor.yaml"
 }
 
 resource "proxmox_vm_qemu" "k8s-node" {
@@ -67,9 +72,16 @@ resource "proxmox_vm_qemu" "k8s-node" {
     bridge = "vmbr0"
   }
 
+  ipconfig0 = "ip=192.168.21.96/24,gw=192.168.21.1"
+
+  nameserver = "192.168.21.88"
+
   lifecycle {
     ignore_changes = [
       network,
     ]
   }
+
+  # /var/lib/vz/snippets/vendor.yaml
+  cicustom = "vendor=local:snippets/vendor.yaml"
 }

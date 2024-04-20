@@ -1,15 +1,37 @@
+# Create K8s VMs in Proxmox
 
-Create Proxmox VMs
+## Deploy K8s VMs using Terraform
+
 `terraform apply --auto-approve`
 
-Update inventory file with node IPs
+## Configure K8s Cluster using Ansible
 
-Configure K8s
-`ansible-playbook -i Ansible/inventory.ini Ansible/playbooks/main.yaml`
+1. Update inventory file with node IPs
+2. Configure K8s
+   `ansible-playbook -i Ansible/inventory.ini Ansible/playbooks/main.yaml`
 
-Manage Remotely
+## Setup Host to Manage K8s Remotely
+
 ```bash
-mkdir -p /Users/ezrahill/.kube && scp -r kube@192.168.21.90:/home/kube/.kube/config $HOME/.kube/config
+mkdir -p /Users/ezrahill/.kube && scp -r kube@192.168.21.77:/home/kube/.kube/config $HOME/.kube/config
 kubectl cluster-info
 kubectl get pods -A
+```
+
+## Install MetalLB inside K8s Cluster
+
+Run the following
+
+```bash
+./metallb-prep.sh
+kubectl apply -f metallb-native.yaml
+kubectl apply -f metallb-ip-pool.yaml
+```
+
+## Install Ingress NGNIX
+*Using this for now, may change out for Traefik*
+
+```bash
+kubectl apply -f ingress-nginx.yaml
+kubectl get service ingress-nginx-controller --namespace=ingress-nginx
 ```
