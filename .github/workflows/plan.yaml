@@ -12,6 +12,9 @@ jobs:
   terraform_plan:
     name: Execute Terraform Plan
     runs-on: [self-hosted, gh-runner-01-k8s-sandbox]
+    container:
+      image: hashicorp/terraform:1.8.2
+      options: --user root
 
     steps:
     - name: Checkout Repository
