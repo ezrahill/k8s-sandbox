@@ -15,30 +15,21 @@ jobs:
     container:
       image: hashicorp/terraform:1.8.2
       options: --user root
+    env:
+      PM_HOSTNAME: ${{ secrets.PM_HOSTNAME }}
+      PM_USER: ${{ secrets.PM_USER }}
+      PM_PASSWORD: ${{ secrets.PM_PASSWORD }}
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Setup Terraform
-      run: terraform --version
-
-    - name: Terraform Init
-      run: terraform init
+    - name: Configure Terraform Variables
+      run: |
+        echo "pm_hostname = \"${PM_HOSTNAME}\"" > terraform.tfvars
+        echo "pm_user = \"${PM_USER}\"" >> terraform.tfvars
+        echo "pm_password = \"${PM_PASSWORD}\"" >> terraform.tfvars
       working-directory: ./Proxmox
-
-    # - name: Setup Node
-    #   uses: actions/setup-node@v2
-    #   with:
-    #     node-version: '20'
-
-    # - name: Setup Terraform
-    #   uses: hashicorp/setup-terraform@v1
-    #   with:
-    #     terraform_version: '1.8.2'
-
-    - name: List Files
-      run: ls -la && pwd
 
     - name: Terraform Init
       run: terraform init
