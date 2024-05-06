@@ -11,4 +11,5 @@ variable "pm_user" {
 variable "pm_password" {
   description = "Password for user"
   type        = string
+  sensitive   = true
 }

@@ -20,6 +20,12 @@ provider "proxmox" {
   }
 }
 
+provider "aws" {
+  region = "us-west-2"  # Specify the default region
+  # Optionally, specify the profile, which is useful if running Terraform locally
+}
+
+
 resource "proxmox_vm_qemu" "k8s-ctl" {
   agent       = 1
   name        = "k8s-ctl"
