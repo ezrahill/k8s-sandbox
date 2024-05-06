@@ -53,11 +53,14 @@ jobs:
 
       - name: Terraform Show Plan
         id: show
-        run: terraform show -no-color tfplan
+        run: |
+          echo "show_output<<EOF" >> $GITHUB_ENV
+          terraform show -no-color tfplan >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - uses: actions/github-script@v6
         env:
-          PLAN: ${{ steps.show.outputs.stdout }}
+          PLAN: ${{ env.show_output }}
         with:
           script: |
             const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
