@@ -53,12 +53,15 @@ jobs:
 
       - name: Terraform Show Plan
         id: show
+        if: github.event_name == 'pull_request'
         run: |
           echo "show_output<<EOF" >> $GITHUB_ENV
           terraform show -no-color tfplan >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - uses: actions/github-script@v6
+      - name: Comment on Pull Request
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
         env:
           PLAN: ${{ env.show_output }}
         with:
