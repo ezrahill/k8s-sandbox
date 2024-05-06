@@ -48,14 +48,15 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan
-        outputs:
-          stdout: ${{ steps.plan.outputs.stdout }}
+        run: terraform plan -out=tfplan
         continue-on-error: true
+
+      - name: Terraform Show Plan
+        run: terraform show -no-color tfplan
 
       - uses: actions/github-script@v6
         env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          PLAN: "terraform\n${{ steps.show.outputs.stdout }}"
         with:
           script: |
             const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
