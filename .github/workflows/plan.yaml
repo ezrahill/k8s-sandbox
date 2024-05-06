@@ -41,25 +41,29 @@ jobs:
         id: init
         run: terraform init
 
-      # - name: Terraform format
-      #   id: fmt
-      #   run: terraform fmt -check
-
       - name: Terraform validate
         id: validate
         run: terraform validate
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -out=tfplan
+        continue-on-error: true
+
+      - name: Terraform Show Plan
+        id: show
+        run: |
+          echo "show_output<<EOF" >> $GITHUB_ENV
+          terraform show -no-color tfplan >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - uses: actions/github-script@v6
         env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          PLAN: ${{ env.show_output }}
         with:
           script: |
-            # const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
@@ -83,6 +87,6 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      # - name: Terraform Apply
-      #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      #   run: terraform apply -auto-approve -input=false
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
