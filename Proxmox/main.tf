@@ -2,8 +2,7 @@ terraform {
   required_providers {
     proxmox = {
       source = "telmate/proxmox"
-      #latest version as of 26 Jan 2023
-      version = "2.9.11"
+      version = "2.9.14"  #latest version as of 26 Jan 2023
     }
   }
 }
@@ -30,7 +29,6 @@ resource "proxmox_vm_qemu" "k8s-ctl" {
   agent       = 1
   name        = "k8s-ctl"
   target_node = "pve-host"
-  vm_state    = "running"
 
   clone      = "ubuntu2204-temp"
   full_clone = "false"
@@ -63,7 +61,6 @@ resource "proxmox_vm_qemu" "k8s-node" {
   agent       = 1
   name        = "k8s-node"
   target_node = "pve-host"
-  vm_state    = "running"
 
   clone      = "ubuntu2204-temp"
   full_clone = "false"
