@@ -30,6 +30,7 @@ resource "proxmox_vm_qemu" "k8s-ctl" {
   agent       = 1
   name        = "k8s-ctl"
   target_node = "pve-host"
+  vm_state    = "running"
 
   clone      = "ubuntu2204-temp"
   full_clone = "false"
@@ -62,6 +63,7 @@ resource "proxmox_vm_qemu" "k8s-node" {
   agent       = 1
   name        = "k8s-node"
   target_node = "pve-host"
+  vm_state    = "running"
 
   clone      = "ubuntu2204-temp"
   full_clone = "false"
