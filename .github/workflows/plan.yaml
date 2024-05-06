@@ -57,7 +57,7 @@ jobs:
 
       - uses: actions/github-script@v6
         env:
-          PLAN: "terraform\n${{ steps.show.outputs.stdout }}"
+          PLAN: ${{ steps.show.outputs.stdout }}
         with:
           script: |
             const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
